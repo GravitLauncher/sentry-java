@@ -1,8 +1,6 @@
 package io.sentry.event;
 
 import io.sentry.event.interfaces.SentryInterface;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -14,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * Plain Old Java Object describing an event that will be sent to a Sentry server.
@@ -32,7 +31,8 @@ import java.util.UUID;
  * </ul>
  */
 public class Event implements Serializable {
-    private static final Logger _logger = LoggerFactory.getLogger(Event.class);
+	private static final long serialVersionUID = -4153510660664754900L;
+	private static final Logger _logger = Logger.getLogger(Event.class.getName());
     /**
      * Unique identifier of the event.
      */
@@ -275,7 +275,7 @@ public class Event implements Serializable {
             // code to be removed (and thus silently not run). In this case, our overridden
             // `readObject` may never be called and `extra` will remain null. :(
             extra = new HashMap<>();
-            _logger.warn("`extra` field was null, deserialization must not have been called,"
+            _logger.info("`extra` field was null, deserialization must not have been called,"
                     + " please check your ProGuard (or other obfuscation) configuration.");
         }
 

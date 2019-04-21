@@ -7,7 +7,8 @@ import java.util.Objects;
  * The User interface for Sentry allows to send details about the User currently using the application.
  */
 public class UserInterface implements SentryInterface {
-    /**
+	private static final long serialVersionUID = 1839674246825341367L;
+	/**
      * Name of the user interface in Sentry.
      */
     public static final String USER_INTERFACE = "sentry.interfaces.User";

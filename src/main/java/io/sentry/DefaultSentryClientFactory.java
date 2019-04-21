@@ -8,14 +8,11 @@ import io.sentry.context.ContextManager;
 import io.sentry.context.ThreadLocalContextManager;
 import io.sentry.dsn.Dsn;
 import io.sentry.event.helper.ContextBuilderHelper;
-import io.sentry.event.helper.HttpEventBuilderHelper;
 import io.sentry.event.interfaces.*;
 import io.sentry.jvmti.FrameCache;
 import io.sentry.marshaller.Marshaller;
 import io.sentry.marshaller.json.*;
 import io.sentry.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.InetSocketAddress;
@@ -25,6 +22,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 /**
  * Default implementation of {@link SentryClientFactory}.
@@ -220,7 +218,7 @@ public class DefaultSentryClientFactory extends SentryClientFactory {
      */
     public static final String UNCAUGHT_HANDLER_ENABLED_OPTION = "uncaught.handler.enabled";
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultSentryClientFactory.class);
+    private static final Logger logger = Logger.getLogger(DefaultSentryClientFactory.class.getName());
     private static final String FALSE = Boolean.FALSE.toString();
 
     private static final Map<String, RejectedExecutionHandler> REJECT_EXECUTION_HANDLERS = new HashMap<>();
@@ -234,20 +232,11 @@ public class DefaultSentryClientFactory extends SentryClientFactory {
     public SentryClient createSentryClient(Dsn dsn) {
         try {
             SentryClient sentryClient = new SentryClient(createConnection(dsn), getContextManager(dsn));
-            try {
-                // `ServletRequestListener` was added in the Servlet 2.4 API, and
-                // is used as part of the `HttpEventBuilderHelper`, see:
-                // https://tomcat.apache.org/tomcat-5.5-doc/servletapi/
-                Class.forName("javax.servlet.ServletRequestListener", false, this.getClass().getClassLoader());
-                sentryClient.addBuilderHelper(new HttpEventBuilderHelper());
-            } catch (ClassNotFoundException e) {
-                logger.debug("The current environment doesn't provide access to servlets,"
-                    + " or provides an unsupported version.");
-            }
+
             sentryClient.addBuilderHelper(new ContextBuilderHelper(sentryClient));
             return configureSentryClient(sentryClient, dsn);
         } catch (Exception e) {
-            logger.error("Failed to initialize sentry, falling back to no-op client", e);
+            logger.finest("Failed to initialize sentry, falling back to no-op client" + e);
             return new SentryClient(new NoopConnection(), new ThreadLocalContextManager());
         }
     }
@@ -323,13 +312,13 @@ public class DefaultSentryClientFactory extends SentryClientFactory {
         Connection connection;
 
         if (protocol.equalsIgnoreCase("http") || protocol.equalsIgnoreCase("https")) {
-            logger.debug("Using an {} connection to Sentry.", protocol.toUpperCase());
+            logger.info(String.format("Using an {} connection to Sentry.", protocol.toUpperCase()));
             connection = createHttpConnection(dsn);
         } else if (protocol.equalsIgnoreCase("out")) {
-            logger.debug("Using StdOut to send events.");
+            logger.info("Using StdOut to send events.");
             connection = createStdOutConnection(dsn);
         } else if (protocol.equalsIgnoreCase("noop")) {
-            logger.debug("Using noop to send events.");
+            logger.info("Using noop to send events.");
             connection = new NoopConnection();
         } else {
             throw new IllegalStateException("Couldn't create a connection for the protocol '" + protocol + "'");
@@ -473,8 +462,6 @@ public class DefaultSentryClientFactory extends SentryClientFactory {
         marshaller.addInterfaceBinding(UserInterface.class, new UserInterfaceBinding());
         marshaller.addInterfaceBinding(DebugMetaInterface.class, new DebugMetaInterfaceBinding());
         HttpInterfaceBinding httpBinding = new HttpInterfaceBinding();
-        //TODO: Add a way to clean the HttpRequest
-        //httpBinding.
         marshaller.addInterfaceBinding(HttpInterface.class, httpBinding);
 
         // Enable compression unless the option is set to false
@@ -489,7 +476,6 @@ public class DefaultSentryClientFactory extends SentryClientFactory {
      * @param maxMessageLength of the whole json output
      * @return new marshaller
      */
-    @SuppressWarnings("WeakerAccess")
     protected JsonMarshaller createJsonMarshaller(int maxMessageLength) {
         return new JsonMarshaller(maxMessageLength);
     }
@@ -521,7 +507,7 @@ public class DefaultSentryClientFactory extends SentryClientFactory {
         if (Util.isNullOrEmpty(inAppFramesOption)) {
             // Only warn if the user didn't set it at all
             if (inAppFramesOption == null) {
-                logger.warn("No '" + IN_APP_FRAMES_OPTION + "' was configured, this option is highly recommended "
+                logger.info("No '" + IN_APP_FRAMES_OPTION + "' was configured, this option is highly recommended "
                     + "as it affects stacktrace grouping and display on Sentry. See documentation: "
                     + "https://docs.sentry.io/clients/java/config/#in-application-stack-frames");
             }
@@ -789,7 +775,7 @@ public class DefaultSentryClientFactory extends SentryClientFactory {
         if (Util.isNullOrEmpty(val)) {
             val = Lookup.lookup(EXTRATAGS_OPTION, dsn);
             if (!Util.isNullOrEmpty(val)) {
-                logger.warn("The '" + EXTRATAGS_OPTION + "' option is deprecated, please use"
+                logger.fine("The '" + EXTRATAGS_OPTION + "' option is deprecated, please use"
                     + " the '" + MDCTAGS_OPTION + "' option instead.");
             }
         }
@@ -902,7 +888,6 @@ public class DefaultSentryClientFactory extends SentryClientFactory {
      * Those (usually) low priority threads will allow to send event details to sentry concurrently without slowing
      * down the main application.
      */
-    @SuppressWarnings("PMD.AvoidThreadGroup")
     protected static final class DaemonThreadFactory implements ThreadFactory {
         private static final AtomicInteger POOL_NUMBER = new AtomicInteger(1);
         private final ThreadGroup group;

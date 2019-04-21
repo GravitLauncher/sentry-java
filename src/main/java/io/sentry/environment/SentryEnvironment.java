@@ -1,9 +1,7 @@
 package io.sentry.environment;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 /**
  * Manages environment information on Sentry.
@@ -19,7 +17,7 @@ public final class SentryEnvironment {
     /**
      * Version of this SDK.
      */
-    public static final String SDK_VERSION = Version.SDK_VERSION;
+    public static final String SDK_VERSION = "1.7.22-2a267";
     /**
      * Indicates whether the current thread is managed by sentry or not.
      */
@@ -29,7 +27,7 @@ public final class SentryEnvironment {
             return new AtomicInteger();
         }
     };
-    private static final Logger logger = LoggerFactory.getLogger(SentryEnvironment.class);
+    private static final Logger logger = Logger.getLogger(SentryEnvironment.class.getName());
 
     private SentryEnvironment() {
     }
@@ -52,7 +50,7 @@ public final class SentryEnvironment {
     public static void startManagingThread() {
         try {
             if (isManagingThread()) {
-                logger.warn("Thread already managed by Sentry");
+                logger.fine("Thread already managed by Sentry");
             }
         } finally {
             SENTRY_THREAD.get().incrementAndGet();
@@ -69,7 +67,7 @@ public final class SentryEnvironment {
             if (!isManagingThread()) {
                 //Start managing the thread only to send the warning
                 startManagingThread();
-                logger.warn("Thread not yet managed by Sentry");
+                logger.fine("Thread not yet managed by Sentry");
             }
         } finally {
             if (SENTRY_THREAD.get().decrementAndGet() == 0) {

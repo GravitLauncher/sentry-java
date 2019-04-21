@@ -10,7 +10,8 @@ import java.util.Objects;
  * Richer StackTraceElement class.
  */
 public class SentryStackTraceElement implements Serializable {
-    private final String module;
+	private static final long serialVersionUID = 3910455285904799154L;
+	private final String module;
     private final String function;
     private final String fileName;
     private final int lineno;

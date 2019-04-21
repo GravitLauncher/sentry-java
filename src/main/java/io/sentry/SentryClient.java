@@ -12,12 +12,11 @@ import io.sentry.event.helper.EventBuilderHelper;
 import io.sentry.event.helper.ShouldSendEventCallback;
 import io.sentry.event.interfaces.ExceptionInterface;
 import io.sentry.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Logger;
 
 /**
  * Sentry client, for sending {@link Event}s to a Sentry server.
@@ -26,10 +25,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * {@link SentryClientFactory#createSentryClient(io.sentry.dsn.Dsn)}, which will use the best factory available.
  */
 public class SentryClient {
-    private static final Logger logger = LoggerFactory.getLogger(SentryClient.class);
-    // CHECKSTYLE.OFF: ConstantName
-    private static final Logger lockdownLogger = LoggerFactory.getLogger(SentryClient.class.getName() + ".lockdown");
-    // CHECKSTYLE.ON: ConstantName
+    private static final Logger logger = Logger.getLogger(SentryClient.class.getName());
     /**
      * Identifies the version of the application.
      * <p>
@@ -126,7 +122,7 @@ public class SentryClient {
     public void sendEvent(Event event) {
         for (ShouldSendEventCallback shouldSendEventCallback : shouldSendEventCallbacks) {
             if (!shouldSendEventCallback.shouldSend(event)) {
-                logger.trace("Not sending Event because of ShouldSendEventCallback: {}", shouldSendEventCallback);
+                logger.info("Not sending Event because of ShouldSendEventCallback: " + shouldSendEventCallback);
                 return;
             }
         }
@@ -134,9 +130,9 @@ public class SentryClient {
         try {
             connection.send(event);
         } catch (LockedDownException | TooManyRequestsException e) {
-            logger.debug("Dropping an Event due to lockdown: " + event);
+            logger.info("Dropping an Event due to lockdown: " + event);
         } catch (Exception e) {
-            logger.error("An exception occurred while sending the event to Sentry.", e);
+            logger.finest("An exception occurred while sending the event to Sentry. " + e);
         } finally {
             getContext().setLastEventId(event.getId());
         }
@@ -209,7 +205,7 @@ public class SentryClient {
      * @param builderHelper builder helper to remove.
      */
     public void removeBuilderHelper(EventBuilderHelper builderHelper) {
-        logger.debug("Removing '{}' from the list of builder helpers.", builderHelper);
+        logger.info(String.format("Removing '{}' from the list of builder helpers.", builderHelper));
         builderHelpers.remove(builderHelper);
     }
 
@@ -219,7 +215,7 @@ public class SentryClient {
      * @param builderHelper builder helper to add.
      */
     public void addBuilderHelper(EventBuilderHelper builderHelper) {
-        logger.debug("Adding '{}' to the list of builder helpers.", builderHelper);
+        logger.info(String.format("Adding '{}' to the list of builder helpers.", builderHelper));
         builderHelpers.add(builderHelper);
     }
 

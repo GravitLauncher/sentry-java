@@ -7,7 +7,8 @@ import java.util.ArrayList;
  * The DebugMeta interface for Sentry allowing to add debug information about ProGuard.
  */
 public class DebugMetaInterface implements SentryInterface {
-    /**
+	private static final long serialVersionUID = 4104905603080966228L;
+	/**
      * Name of the exception interface in Sentry.
      */
     public static final String DEBUG_META_INTERFACE = "debug_meta";
@@ -47,7 +48,8 @@ public class DebugMetaInterface implements SentryInterface {
      * Object that represents a single debug image.
      */
     public static class DebugImage implements Serializable {
-        private static final String DEFAULT_TYPE = "proguard";
+		private static final long serialVersionUID = 3383692841704342779L;
+		private static final String DEFAULT_TYPE = "proguard";
         private final String uuid;
         private final String type;
 

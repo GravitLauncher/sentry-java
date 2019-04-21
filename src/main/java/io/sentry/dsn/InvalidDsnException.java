@@ -7,7 +7,8 @@ package io.sentry.dsn;
  * server issuing an authentication error.
  */
 public class InvalidDsnException extends RuntimeException {
-    //CHECKSTYLE.OFF: JavadocMethod
+	private static final long serialVersionUID = -3020111926145057528L;
+
     public InvalidDsnException() {
     }
 
@@ -22,5 +23,4 @@ public class InvalidDsnException extends RuntimeException {
     public InvalidDsnException(Throwable cause) {
         super(cause);
     }
-    //CHECKSTYLE.ON: JavadocMethod
 }

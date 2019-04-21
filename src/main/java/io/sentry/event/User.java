@@ -10,8 +10,8 @@ import java.util.Map;
  * in your application (typically a web request).
  */
 public class User implements Serializable {
-
-    private final String id;
+	private static final long serialVersionUID = -4695819353032790308L;
+	private final String id;
     private final String username;
     private final String ipAddress;
     private final String email;

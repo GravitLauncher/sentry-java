@@ -3,8 +3,6 @@ package io.sentry.connection;
 import io.sentry.environment.SentryEnvironment;
 import io.sentry.event.Event;
 import io.sentry.marshaller.Marshaller;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -17,6 +15,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 /**
  * Basic connection to a Sentry server, using HTTP and HTTPS.
@@ -29,7 +28,7 @@ public class HttpConnection extends AbstractConnection {
      */
     public static final int HTTP_TOO_MANY_REQUESTS = 429;
     private static final Charset UTF_8 = Charset.forName("UTF-8");
-    private static final Logger logger = LoggerFactory.getLogger(HttpConnection.class);
+    private static final Logger logger = Logger.getLogger(HttpConnection.class.getName());
     /**
      * HTTP Header for the user agent.
      */
@@ -189,7 +188,7 @@ public class HttpConnection extends AbstractConnection {
             try {
                 responseCode = connection.getResponseCode();
                 if (responseCode == HttpURLConnection.HTTP_FORBIDDEN) {
-                    logger.debug("Event '" + event.getId() + "' was rejected by the Sentry server due to a filter.");
+                    logger.info("Event '" + event.getId() + "' was rejected by the Sentry server due to a filter.");
                     return;
                 } else if (responseCode == HTTP_TOO_MANY_REQUESTS) {
                     /*
@@ -234,7 +233,7 @@ public class HttpConnection extends AbstractConnection {
                 first = false;
             }
         } catch (Exception e2) {
-            logger.error("Exception while reading the error message from the connection.", e2);
+            logger.finest("Exception while reading the error message from the connection. " + e2);
         }
         return sb.toString();
     }

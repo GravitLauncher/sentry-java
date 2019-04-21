@@ -6,7 +6,9 @@ package io.sentry.connection;
  * This allows connections to know when to back off for a while.
  */
 public class ConnectionException extends RuntimeException {
-    /**
+	private static final long serialVersionUID = -7736756712336820256L;
+
+	/**
      * Recommended duration to initiate a lockdown for, in milliseconds.
      */
     private Long recommendedLockdownTime = null;

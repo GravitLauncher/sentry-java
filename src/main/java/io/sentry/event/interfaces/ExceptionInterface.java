@@ -6,7 +6,8 @@ import java.util.Deque;
  * The Exception interface for Sentry allowing to add an Exception details to an event.
  */
 public class ExceptionInterface implements SentryInterface {
-    /**
+	private static final long serialVersionUID = 6648623859053325184L;
+	/**
      * Name of the exception interface in Sentry.
      */
     public static final String EXCEPTION_INTERFACE = "sentry.interfaces.Exception";

@@ -1,16 +1,16 @@
 package io.sentry;
 
+import java.util.logging.Logger;
+
 import io.sentry.config.Lookup;
 import io.sentry.dsn.Dsn;
 import io.sentry.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Factory in charge of creating {@link SentryClient} instances.
  */
 public abstract class SentryClientFactory {
-    private static final Logger logger = LoggerFactory.getLogger(SentryClientFactory.class);
+    private static final Logger logger = Logger.getLogger(SentryClientFactory.class.getName());
 
     /**
      * Creates an instance of Sentry by discovering the DSN.
@@ -38,7 +38,8 @@ public abstract class SentryClientFactory {
      * @param sentryClientFactory SentryClientFactory instance to use, or null to do a config lookup.
      * @return SentryClient instance, or null if one couldn't be constructed.
      */
-    public static SentryClient sentryClient(String dsn, SentryClientFactory sentryClientFactory) {
+    @SuppressWarnings("unchecked")
+	public static SentryClient sentryClient(String dsn, SentryClientFactory sentryClientFactory) {
         Dsn realDsn = resolveDsn(dsn);
 
         // If the caller didn't pass a factory, try to look one up
@@ -54,8 +55,8 @@ public abstract class SentryClientFactory {
                     factoryClass = (Class<? extends SentryClientFactory>) Class.forName(sentryClientFactoryName);
                     sentryClientFactory = factoryClass.newInstance();
                 } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-                    logger.error("Error creating SentryClient using factory class: '"
-                        + sentryClientFactoryName + "'.", e);
+                    logger.finest("Error creating SentryClient using factory class: '"
+                        + sentryClientFactoryName + "'. " + e);
                     return null;
                 }
             }
@@ -72,7 +73,7 @@ public abstract class SentryClientFactory {
 
             return new Dsn(dsn);
         } catch (Exception e) {
-            logger.error("Error creating valid DSN from: '{}'.", dsn, e);
+            logger.finest("Error creating valid DSN from: '{}'." + dsn + " " + e);
             throw e;
         }
     }

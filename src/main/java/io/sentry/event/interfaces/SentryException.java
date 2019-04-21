@@ -12,7 +12,8 @@ import java.util.Set;
  * Class associating a Sentry exception to its {@link StackTraceInterface}.
  */
 public final class SentryException implements Serializable {
-    /**
+	private static final long serialVersionUID = -8474102783904579730L;
+	/**
      * Name used when the class' package is the default one.
      */
     public static final String DEFAULT_PACKAGE_NAME = "(default)";

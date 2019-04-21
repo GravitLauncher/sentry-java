@@ -24,7 +24,8 @@ import java.util.Objects;
  * {@link io.sentry.event.EventBuilder#withMessage(String)} in any case.
  */
 public class MessageInterface implements SentryInterface {
-    /**
+	private static final long serialVersionUID = -489203748119616063L;
+	/**
      * Name of the message interface in Sentry.
      */
     public static final String MESSAGE_INTERFACE = "sentry.interfaces.Message";

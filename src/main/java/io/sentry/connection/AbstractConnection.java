@@ -3,11 +3,10 @@ package io.sentry.connection;
 import io.sentry.environment.SentryEnvironment;
 import io.sentry.event.Event;
 import io.sentry.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * Abstract connection to a Sentry server.
@@ -21,11 +20,9 @@ public abstract class AbstractConnection implements Connection {
      * Current Sentry protocol version.
      */
     public static final String SENTRY_PROTOCOL_VERSION = "6";
-    private static final Logger logger = LoggerFactory.getLogger(AbstractConnection.class);
-    // CHECKSTYLE.OFF: ConstantName
+    private static final Logger logger = Logger.getLogger(AbstractConnection.class.getName());
     private static final Logger lockdownLogger =
-            LoggerFactory.getLogger(AbstractConnection.class.getName() + ".lockdown");
-    // CHECKSTYLE.ON: ConstantName
+            Logger.getLogger(AbstractConnection.class.getName() + ".lockdown");
     /**
      * Value of the X-Sentry-Auth header.
      */
@@ -82,8 +79,8 @@ public abstract class AbstractConnection implements Connection {
                 try {
                     eventSendCallback.onSuccess(event);
                 } catch (Exception exc) {
-                    logger.warn("An exception occurred while running an EventSendCallback.onSuccess: "
-                        + eventSendCallback.getClass().getName(), exc);
+                    logger.fine("An exception occurred while running an EventSendCallback.onSuccess: "
+                        + eventSendCallback.getClass().getName() + ' ' + exc);
                 }
             }
         } catch (ConnectionException e) {
@@ -91,14 +88,14 @@ public abstract class AbstractConnection implements Connection {
                 try {
                     eventSendCallback.onFailure(event, e);
                 } catch (Exception exc) {
-                    logger.warn("An exception occurred while running an EventSendCallback.onFailure: "
-                        + eventSendCallback.getClass().getName(), exc);
+                    logger.fine("An exception occurred while running an EventSendCallback.onFailure: "
+                        + eventSendCallback.getClass().getName() + ' ' + exc);
                 }
             }
 
             boolean lockedDown = lockdownManager.lockdown(e);
             if (lockedDown) {
-                lockdownLogger.warn("Initiated a temporary lockdown because of exception: " + e.getMessage());
+                lockdownLogger.fine("Initiated a temporary lockdown because of exception: " + e.getMessage());
             }
 
             throw e;

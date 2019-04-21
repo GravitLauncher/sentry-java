@@ -2,20 +2,19 @@ package io.sentry.config;
 
 import io.sentry.dsn.Dsn;
 import io.sentry.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * Handle lookup of configuration keys by trying JNDI, System Environment, and Java System Properties.
  */
 public final class Lookup {
-    private static final Logger logger = LoggerFactory.getLogger(Lookup.class);
+    private static final Logger logger = Logger.getLogger(Lookup.class.getName());
 
     /**
      * The filename of the Sentry configuration file.
@@ -42,10 +41,10 @@ public final class Lookup {
                 configProps = new Properties();
                 configProps.load(input);
             } else {
-                logger.debug("Sentry configuration file not found in filesystem or classpath: '{}'.", filePath);
+                logger.info("Sentry configuration file not found in filesystem or classpath: '" + filePath + "'");
             }
         } catch (Exception e) {
-            logger.error("Error loading Sentry configuration file '{}': ", filePath, e);
+            logger.finest("Error loading Sentry configuration file '"+ filePath +"': "+ e);
         } finally {
             Util.closeQuietly(input);
         }
@@ -115,10 +114,10 @@ public final class Lookup {
                 Class.forName("javax.naming.InitialContext", false, Dsn.class.getClassLoader());
                 value = JndiLookup.jndiLookup(key);
                 if (value != null) {
-                    logger.debug("Found {}={} in JNDI.", key, value);
+                    logger.info(String.format("Found {}={} in JNDI.", key, value));
                 }
             } catch (ClassNotFoundException | NoClassDefFoundError e) {
-                logger.trace("JNDI is not available: " + e.getMessage());
+                logger.info("JNDI is not available: " + e.getMessage());
                 checkJndi = false;
             }
         }
@@ -127,7 +126,7 @@ public final class Lookup {
         if (value == null) {
             value = System.getProperty("sentry." + key.toLowerCase());
             if (value != null) {
-                logger.debug("Found {}={} in Java System Properties.", key, value);
+                logger.info(String.format("Found {}={} in Java System Properties.", key, value));
             }
         }
 
@@ -135,7 +134,7 @@ public final class Lookup {
         if (value == null) {
             value = System.getenv("SENTRY_" + key.replace(".", "_").toUpperCase());
             if (value != null) {
-                logger.debug("Found {}={} in System Environment Variables.", key, value);
+                logger.info(String.format("Found {}={} in System Environment Variables.", key, value));
             }
         }
 
@@ -143,7 +142,7 @@ public final class Lookup {
         if (value == null && dsn != null) {
             value = dsn.getOptions().get(key);
             if (value != null) {
-                logger.debug("Found {}={} in DSN.", key, value);
+                logger.info(String.format("Found {}={} in DSN.", key, value));
             }
         }
 
@@ -151,7 +150,7 @@ public final class Lookup {
         if (value == null && configProps != null) {
             value = configProps.getProperty(key);
             if (value != null) {
-                logger.debug("Found {}={} in {}.", key, value, CONFIG_FILE_NAME);
+                logger.info(String.format("Found {}={} in {}.", key, value, CONFIG_FILE_NAME));
             }
         }
 

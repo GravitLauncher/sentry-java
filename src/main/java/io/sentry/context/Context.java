@@ -14,7 +14,8 @@ import java.util.*;
  * then sent together when an exception occurs.
  */
 public class Context implements Serializable {
-    /**
+	private static final long serialVersionUID = 6809926911797304693L;
+	/**
      * The number of {@link Breadcrumb}s to keep in the ring buffer by default.
      */
     private static final int DEFAULT_BREADCRUMB_LIMIT = 100;

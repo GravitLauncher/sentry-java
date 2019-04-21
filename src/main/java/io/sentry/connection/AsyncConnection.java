@@ -1,12 +1,9 @@
 package io.sentry.connection;
 
-import io.sentry.SentryClient;
+import io.sentry.MultiThreadContext;
 import io.sentry.environment.SentryEnvironment;
 import io.sentry.event.Event;
 import io.sentry.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,6 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 /**
  * Asynchronous usage of a connection.
@@ -22,10 +20,7 @@ import java.util.concurrent.TimeUnit;
  * and submit the event.
  */
 public class AsyncConnection implements Connection {
-    private static final Logger logger = LoggerFactory.getLogger(AsyncConnection.class);
-    // CHECKSTYLE.OFF: ConstantName
-    private static final Logger lockdownLogger = LoggerFactory.getLogger(SentryClient.class.getName() + ".lockdown");
-    // CHECKSTYLE.ON: ConstantName
+    private static final Logger logger = Logger.getLogger(AsyncConnection.class.getName());
     /**
      * Timeout of the {@link #executorService}, in milliseconds.
      */
@@ -93,7 +88,7 @@ public class AsyncConnection implements Connection {
     @Override
     public void send(Event event) {
         if (!closed) {
-            executorService.execute(new EventSubmitter(event, MDC.getCopyOfContextMap()));
+            executorService.execute(new EventSubmitter(event, MultiThreadContext.getCopyOfContextMap()));
         }
     }
 
@@ -125,9 +120,8 @@ public class AsyncConnection implements Connection {
      *
      * @see #close()
      */
-    @SuppressWarnings("checkstyle:magicnumber")
     private void doClose() throws IOException {
-        logger.debug("Gracefully shutting down Sentry async threads.");
+        logger.info("Gracefully shutting down Sentry async threads.");
         closed = true;
         executorService.shutdown();
         try {
@@ -138,19 +132,19 @@ public class AsyncConnection implements Connection {
                     if (executorService.awaitTermination(waitBetweenLoggingMs, TimeUnit.MILLISECONDS)) {
                         break;
                     }
-                    logger.debug("Still waiting on async executor to terminate.");
+                    logger.info("Still waiting on async executor to terminate.");
                 }
             } else if (!executorService.awaitTermination(shutdownTimeout, TimeUnit.MILLISECONDS)) {
-                logger.warn("Graceful shutdown took too much time, forcing the shutdown.");
+                logger.info("Graceful shutdown took too much time, forcing the shutdown.");
                 List<Runnable> tasks = executorService.shutdownNow();
-                logger.warn("{} tasks failed to execute before shutdown.", tasks.size());
+                logger.info(tasks.size() + " tasks failed to execute before shutdown.");
             }
-            logger.debug("Shutdown finished.");
+            logger.info("Shutdown finished.");
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            logger.warn("Graceful shutdown interrupted, forcing the shutdown.");
+            logger.info("Graceful shutdown interrupted, forcing the shutdown.");
             List<Runnable> tasks = executorService.shutdownNow();
-            logger.warn("{} tasks failed to execute before shutdown.", tasks.size());
+            logger.info(tasks.size() + " tasks failed to execute before shutdown.");
         } finally {
             actualConnection.close();
         }
@@ -173,25 +167,25 @@ public class AsyncConnection implements Connection {
         public void run() {
             SentryEnvironment.startManagingThread();
 
-            Map<String, String> previous = MDC.getCopyOfContextMap();
+            Map<String, String> previous = MultiThreadContext.getCopyOfContextMap();
             if (mdcContext == null) {
-                MDC.clear();
+                MultiThreadContext.clear();
             } else {
-                MDC.setContextMap(mdcContext);
+                MultiThreadContext.setContextMap(mdcContext);
             }
 
             try {
                 // The current thread is managed by sentry
                 actualConnection.send(event);
             } catch (LockedDownException | TooManyRequestsException e) {
-                logger.debug("Dropping an Event due to lockdown: " + event);
+                logger.info("Dropping an Event due to lockdown: " + event);
             } catch (Exception e) {
-                logger.error("An exception occurred while sending the event to Sentry.", e);
+                logger.finest("An exception occurred while sending the event to Sentry. " + e);
             } finally {
                 if (previous == null) {
-                    MDC.clear();
+                    MultiThreadContext.clear();
                 } else {
-                    MDC.setContextMap(previous);
+                    MultiThreadContext.setContextMap(previous);
                 }
 
                 SentryEnvironment.stopManagingThread();
@@ -217,7 +211,7 @@ public class AsyncConnection implements Connection {
                 // The current thread is managed by sentry
                 AsyncConnection.this.doClose();
             } catch (Exception e) {
-                logger.error("An exception occurred while closing the connection.", e);
+                logger.finest("An exception occurred while closing the connection. " + e);
             } finally {
                 SentryEnvironment.stopManagingThread();
             }

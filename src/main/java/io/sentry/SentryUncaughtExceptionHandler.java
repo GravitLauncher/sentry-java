@@ -1,17 +1,17 @@
 package io.sentry;
 
+import java.util.logging.Logger;
+
 import io.sentry.event.Event;
 import io.sentry.event.EventBuilder;
 import io.sentry.event.interfaces.ExceptionInterface;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Sends any uncaught exception to Sentry, then passes the exception on to the pre-existing
  * uncaught exception handler.
  */
 public class SentryUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
-    private static final Logger logger = LoggerFactory.getLogger(SentryClientFactory.class);
+    private static final Logger logger = Logger.getLogger(SentryClientFactory.class.getName());
 
     /**
      * Reference to the pre-existing uncaught exception handler.
@@ -44,7 +44,7 @@ public class SentryUncaughtExceptionHandler implements Thread.UncaughtExceptionH
     @Override
     public void uncaughtException(Thread thread, Throwable thrown) {
         if (enabled) {
-            logger.trace("Uncaught exception received.");
+            logger.info("Uncaught exception received.");
 
             EventBuilder eventBuilder = new EventBuilder()
                 .withMessage(thrown.getMessage())
@@ -54,7 +54,7 @@ public class SentryUncaughtExceptionHandler implements Thread.UncaughtExceptionH
             try {
                 Sentry.capture(eventBuilder);
             } catch (Exception e) {
-                logger.error("Error sending uncaught exception to Sentry.", e);
+                logger.finest("Error sending uncaught exception to Sentry. " + e);
             }
         }
 
@@ -77,11 +77,11 @@ public class SentryUncaughtExceptionHandler implements Thread.UncaughtExceptionH
      * @return {@link SentryUncaughtExceptionHandler} that was setup.
      */
     public static SentryUncaughtExceptionHandler setup() {
-        logger.debug("Configuring uncaught exception handler.");
+        logger.info("Configuring uncaught exception handler.");
 
         Thread.UncaughtExceptionHandler currentHandler = Thread.getDefaultUncaughtExceptionHandler();
         if (currentHandler != null) {
-            logger.debug("default UncaughtExceptionHandler class='" + currentHandler.getClass().getName() + "'");
+            logger.info("default UncaughtExceptionHandler class='" + currentHandler.getClass().getName() + "'");
         }
 
         SentryUncaughtExceptionHandler handler = new SentryUncaughtExceptionHandler(currentHandler);

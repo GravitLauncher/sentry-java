@@ -11,8 +11,8 @@ import java.util.Objects;
  * which lead to the Event happening.
  */
 public class Breadcrumb implements Serializable {
-
-    /**
+	private static final long serialVersionUID = 6358966441073768998L;
+	/**
      * (Optional) Type of the breadcrumb.
      */
     private final Type type;

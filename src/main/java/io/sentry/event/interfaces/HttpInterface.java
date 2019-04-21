@@ -1,17 +1,14 @@
 package io.sentry.event.interfaces;
 
-import io.sentry.event.helper.BasicRemoteAddressResolver;
-import io.sentry.event.helper.RemoteAddressResolver;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
  * The HTTP interface for Sentry allows to add an HTTP request to an event.
  */
 public class HttpInterface implements SentryInterface {
-    /**
+	private static final long serialVersionUID = 598470211589537138L;
+	/**
      * Name of the HTTP interface in Sentry.
      */
     public static final String HTTP_INTERFACE = "sentry.interfaces.Http";
@@ -33,68 +30,6 @@ public class HttpInterface implements SentryInterface {
     private final String remoteUser;
     private final Map<String, Collection<String>> headers;
     private final String body;
-
-    /**
-     * This constructor is for compatibility reasons and should not be used.
-     *
-     * @param request HttpServletRequest
-     */
-    public HttpInterface(HttpServletRequest request) {
-        this(request, new BasicRemoteAddressResolver());
-    }
-
-    /**
-     * Creates an HTTP element for an {@link io.sentry.event.Event}.
-     *
-     * @param request Captured HTTP request to send to Sentry.
-     * @param remoteAddressResolver RemoteAddressResolver
-     */
-    public HttpInterface(HttpServletRequest request, RemoteAddressResolver remoteAddressResolver) {
-        this(request, remoteAddressResolver, null);
-    }
-
-    /**
-     * Creates an HTTP element for an {@link io.sentry.event.Event}.
-     *
-     * @param request Captured HTTP request to send to Sentry.
-     * @param remoteAddressResolver RemoteAddressResolver
-     * @param body HTTP request body (optional)
-     */
-    public HttpInterface(HttpServletRequest request, RemoteAddressResolver remoteAddressResolver, String body) {
-        this.requestUrl = request.getRequestURL().toString();
-        this.method = request.getMethod();
-        this.parameters = new HashMap<>();
-        for (Map.Entry<String, String[]> parameterMapEntry : request.getParameterMap().entrySet()) {
-            this.parameters.put(parameterMapEntry.getKey(), Arrays.asList(parameterMapEntry.getValue()));
-        }
-        this.queryString = request.getQueryString();
-        if (request.getCookies() != null) {
-            this.cookies = new HashMap<>();
-            for (Cookie cookie : request.getCookies()) {
-                this.cookies.put(cookie.getName(), cookie.getValue());
-            }
-        } else {
-            this.cookies = Collections.emptyMap();
-        }
-        this.remoteAddr = remoteAddressResolver.getRemoteAddress(request);
-        this.serverName = request.getServerName();
-        this.serverPort = request.getServerPort();
-        this.localAddr = request.getLocalAddr();
-        this.localName = request.getLocalName();
-        this.localPort = request.getLocalPort();
-        this.protocol = request.getProtocol();
-        this.secure = request.isSecure();
-        this.asyncStarted = request.isAsyncStarted();
-        this.authType = request.getAuthType();
-        this.remoteUser = request.getRemoteUser();
-        this.headers = new HashMap<>();
-        for (String headerName : Collections.list(request.getHeaderNames())) {
-            this.headers.put(headerName, Collections.list(request.getHeaders(headerName)));
-        }
-        this.body = body;
-    }
-
-    // CHECKSTYLE.OFF: ParameterNumber
 
     /**
      * Creates an HTTP element for an {@link io.sentry.event.Event}.

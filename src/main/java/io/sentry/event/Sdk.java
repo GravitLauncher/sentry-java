@@ -7,7 +7,8 @@ import java.util.Set;
  * Represents the current SDK and any integrations used to create an {@link Event}.
  */
 public class Sdk implements Serializable {
-    /**
+	private static final long serialVersionUID = 5198853704746373971L;
+	/**
      * Name of the SDK.
      */
     private String name;
