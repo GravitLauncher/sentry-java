@@ -1,6 +1,0 @@
-Bundle-Name: ${project.name}
-Bundle-Description: ${project.description}
-
--exportcontents:\
-    io.sentry.android,\
-    io.sentry.android.event.helper
