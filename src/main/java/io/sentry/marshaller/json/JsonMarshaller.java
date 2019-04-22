@@ -8,14 +8,13 @@ import io.sentry.event.Sdk;
 import io.sentry.event.interfaces.SentryInterface;
 import io.sentry.marshaller.Marshaller;
 import io.sentry.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -120,7 +119,7 @@ public class JsonMarshaller implements Marshaller {
         }
     };
 
-    private static final Logger logger = LoggerFactory.getLogger(JsonMarshaller.class);
+    private static final Logger logger = Logger.getLogger(JsonMarshaller.class.getName());
     private final JsonFactory jsonFactory = new JsonFactory();
     private final Map<Class<? extends SentryInterface>, InterfaceBinding<?>> interfaceBindings = new HashMap<>();
     /**
@@ -160,12 +159,12 @@ public class JsonMarshaller implements Marshaller {
         try (JsonGenerator generator = createJsonGenerator(destination)) {
             writeContent(generator, event);
         } catch (IOException e) {
-            logger.error("An exception occurred while serialising the event.", e);
+            logger.finest("An exception occurred while serialising the event. " + e);
         } finally {
             try {
                 destination.close();
             } catch (IOException e) {
-                logger.error("An exception occurred while serialising the event.", e);
+                logger.finest("An exception occurred while serialising the event. " + e);
             }
         }
     }
@@ -178,7 +177,6 @@ public class JsonMarshaller implements Marshaller {
      * @return a new instance
      * @throws IOException on error reading the stream
      */
-    @SuppressWarnings("WeakerAccess")
     protected JsonGenerator createJsonGenerator(OutputStream destination) throws IOException {
         return new SentryJsonGenerator(jsonFactory.createGenerator(destination));
     }
@@ -232,8 +230,8 @@ public class JsonMarshaller implements Marshaller {
                 generator.writeFieldName(interfaceEntry.getKey());
                 getInterfaceBinding(sentryInterface).writeInterface(generator, interfaceEntry.getValue());
             } else {
-                logger.error("Couldn't parse the content of '{}' provided in {}.",
-                    interfaceEntry.getKey(), sentryInterface);
+                logger.finest(String.format("Couldn't parse the content of '{}' provided in {}.",
+                    interfaceEntry.getKey(), sentryInterface));
             }
         }
     }
@@ -285,7 +283,6 @@ public class JsonMarshaller implements Marshaller {
         generator.writeEndObject();
     }
 
-    @SuppressWarnings("checkstyle:magicnumber")
     private void writeBreadcumbs(JsonGenerator generator, List<Breadcrumb> breadcrumbs) throws IOException {
         if (breadcrumbs.isEmpty()) {
             return;
@@ -372,8 +369,8 @@ public class JsonMarshaller implements Marshaller {
             case ERROR:
                 return "error";
             default:
-                logger.error("The level '{}' isn't supported, this should NEVER happen, contact Sentry developers",
-                    level.name());
+                logger.finest(String.format("The level '{}' isn't supported, this should NEVER happen, contact Sentry developers",
+                    level.name()));
                 return null;
         }
     }

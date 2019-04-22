@@ -2,8 +2,6 @@ package io.sentry.marshaller.json;
 
 import com.fasterxml.jackson.core.*;
 import io.sentry.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +9,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * JsonGenerator that makes an attempt at serializing any Java POJO to the "best"
@@ -21,7 +20,7 @@ import java.util.Map;
  * underlying {@link JsonGenerator}.
  */
 public class SentryJsonGenerator extends JsonGenerator {
-    private static final Logger logger = LoggerFactory.getLogger(Util.class);
+    private static final Logger logger = Logger.getLogger(Util.class.getName());
 
     private static final String RECURSION_LIMIT_HIT = "<recursion limit hit>";
     private static final int MAX_LENGTH_LIST = 10;
@@ -111,8 +110,8 @@ public class SentryJsonGenerator extends JsonGenerator {
                 /** @see com.fasterxml.jackson.core.JsonGenerator#_writeSimpleObject(Object)  */
                 generator.writeObject(value);
             } catch (IllegalStateException e) {
-                logger.debug("Couldn't marshal '{}' of type '{}', had to be converted into a String",
-                        value, value.getClass());
+                logger.info(String.format("Couldn't marshal '{}' of type '{}', had to be converted into a String",
+                        value, value.getClass()));
                 try {
                     generator.writeString(Util.trimString(value.toString(), maxLengthString));
                 } catch (Exception innerE) {
