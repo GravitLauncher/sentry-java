@@ -253,7 +253,8 @@ public class SentryJsonGenerator extends JsonGenerator {
         return generator.getFeatureMask();
     }
 
-    @Override
+    @SuppressWarnings("deprecation")
+	@Override
     public JsonGenerator setFeatureMask(int values) {
         return generator.setFeatureMask(values);
     }

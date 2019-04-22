@@ -19,9 +19,6 @@ public class StackTraceInterfaceBinding implements InterfaceBinding<StackTraceIn
     private static final String LINE_NO_PARAMETER = "lineno";
     private static final String COL_NO_PARAMETER = "colno";
     private static final String ABSOLUTE_PATH_PARAMETER = "abs_path";
-    private static final String CONTEXT_LINE_PARAMETER = "context_line";
-    private static final String PRE_CONTEXT_PARAMETER = "pre_context";
-    private static final String POST_CONTEXT_PARAMETER = "post_context";
     private static final String IN_APP_PARAMETER = "in_app";
     private static final String VARIABLES_PARAMETER = "vars";
     private static final String PLATFORM_PARAMTER = "platform";
@@ -76,7 +73,6 @@ public class StackTraceInterfaceBinding implements InterfaceBinding<StackTraceIn
     }
 
     private boolean isFrameInApp(SentryStackTraceElement stackTraceElement) {
-        // TODO: A linear search is not efficient here, a Trie could be a better solution.
         for (String inAppFrame : inAppFrames) {
             String className = stackTraceElement.getModule();
             if (className.startsWith(inAppFrame) && !isBlacklistedFromInApp(className)) {
