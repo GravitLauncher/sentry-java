@@ -4,45 +4,49 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- * Represents the current SDK and any integrations used to create an {@link Event}.
+ * Represents the current SDK and any integrations used to create an
+ * {@link Event}.
  */
 public class Sdk implements Serializable {
 	private static final long serialVersionUID = 5198853704746373971L;
 	/**
-     * Name of the SDK.
-     */
-    private String name;
-    /**
-     * Version of the SDK.
-     */
-    private String version;
-    /**
-     * Set of integrations used.
-     */
-    private Set<String> integrations;
+	 * Name of the SDK.
+	 */
+	private String name;
+	/**
+	 * Version of the SDK.
+	 */
+	private String version;
+	/**
+	 * Set of integrations used.
+	 */
+	private Set<String> integrations;
 
-    /**
-     * Build an {@link Sdk} instance.
-     *
-     * @param name Name of the SDK.
-     * @param version Version of the SDK.
-     * @param integrations Set of integrations used.
-     */
-    public Sdk(String name, String version, Set<String> integrations) {
-        this.name = name;
-        this.version = version;
-        this.integrations = integrations;
-    }
+	/**
+	 * Build an {@link Sdk} instance.
+	 *
+	 * @param name
+	 *            Name of the SDK.
+	 * @param version
+	 *            Version of the SDK.
+	 * @param integrations
+	 *            Set of integrations used.
+	 */
+	public Sdk(String name, String version, Set<String> integrations) {
+		this.name = name;
+		this.version = version;
+		this.integrations = integrations;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public Set<String> getIntegrations() {
+		return integrations;
+	}
 
-    public String getVersion() {
-        return version;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public Set<String> getIntegrations() {
-        return integrations;
-    }
+	public String getVersion() {
+		return version;
+	}
 }

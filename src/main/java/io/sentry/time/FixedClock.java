@@ -8,38 +8,41 @@ import java.util.concurrent.TimeUnit;
  * Useful for mocking time in tests.
  */
 public class FixedClock implements Clock {
-    private Date date;
+	private Date date;
 
-    /**
-     * Construct a FixedClock with the given date.
-     *
-     * @param date Date to set the FixedClock to.
-     */
-    public FixedClock(Date date) {
-        this.date = date;
-    }
+	/**
+	 * Construct a FixedClock with the given date.
+	 *
+	 * @param date
+	 *            Date to set the FixedClock to.
+	 */
+	public FixedClock(Date date) {
+		this.date = date;
+	}
 
-    @Override
-    public long millis() {
-        return date.getTime();
-    }
+	@Override
+	public Date date() {
+		return date;
+	}
 
-    @Override
-    public Date date() {
-        return date;
-    }
+	@Override
+	public long millis() {
+		return date.getTime();
+	}
 
-    public void setDate(Date date) {
-        this.date = date;
-    }
+	public void setDate(Date date) {
+		this.date = date;
+	}
 
-    /**
-     * Adjust the FixedClock by the given amount.
-     *
-     * @param duration Duration of time to adjust the clock by.
-     * @param unit Unit of time to adjust the clock by.
-     */
-    public void tick(long duration, TimeUnit unit) {
-        this.date = new Date(date.getTime() + unit.toMillis(duration));
-    }
+	/**
+	 * Adjust the FixedClock by the given amount.
+	 *
+	 * @param duration
+	 *            Duration of time to adjust the clock by.
+	 * @param unit
+	 *            Unit of time to adjust the clock by.
+	 */
+	public void tick(long duration, TimeUnit unit) {
+		date = new Date(date.getTime() + unit.toMillis(duration));
+	}
 }

@@ -6,11 +6,8 @@ package io.sentry.connection;
 public class TooManyRequestsException extends ConnectionException {
 	private static final long serialVersionUID = -1425193695905138794L;
 
-    public TooManyRequestsException(
-            String message,
-            Throwable cause,
-            Long recommendedLockdownTime,
-            Integer responseCode) {
-        super(message, cause, recommendedLockdownTime, responseCode);
-    }
+	public TooManyRequestsException(String message, Throwable cause, Long recommendedLockdownTime,
+			Integer responseCode) {
+		super(message, cause, recommendedLockdownTime, responseCode);
+	}
 }

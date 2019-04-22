@@ -10,95 +10,92 @@ import java.util.Map;
  * Class representing a single call frame.
  */
 public final class Frame {
-    /**
-     * Method that this frame originated in.
-     */
-    private Method method;
-    /**
-     * Local variable information for this frame.
-     */
-    private final LocalVariable[] locals;
+	/**
+	 * Class representing a single local variable.
+	 */
+	public static final class LocalVariable {
+		/**
+		 * Variable name.
+		 */
+		final String name;
+		/**
+		 * Variable value.
+		 */
+		final Object value;
 
-    /**
-     * Construct a {@link Frame}.
-     *
-     * @param method Method that this frame originated in.
-     * @param locals Local variable information for this frame.
-     */
-    public Frame(Method method, LocalVariable[] locals) {
-        this.method = method;
-        this.locals = locals;
-    }
+		/**
+		 * Construct a {@link LocalVariable} for a live object.
+		 *
+		 * @param name
+		 *            Variable name.
+		 * @param value
+		 *            Variable value.
+		 */
+		public LocalVariable(String name, Object value) {
+			this.name = name;
+			this.value = value;
+		}
 
-    public Method getMethod() {
-        return method;
-    }
+		public String getName() {
+			return name;
+		}
 
-    /**
-     * Converts the locals array to a Map of variable-name -> variable-value.
-     *
-     * @return Map of variable-name -> variable-value.
-     */
-    public Map<String, Object> getLocals() {
-        if (locals == null || locals.length == 0) {
-            return Collections.emptyMap();
-        }
+		public Object getValue() {
+			return value;
+		}
 
-        Map<String, Object> localsMap = new HashMap<>();
-        for (Frame.LocalVariable localVariable : locals) {
-            if (localVariable != null) {
-                localsMap.put(localVariable.getName(), localVariable.getValue());
-            }
-        }
+		@Override
+		public String toString() {
+			return "LocalVariable{" + "name='" + name + '\'' + ", value=" + value + '}';
+		}
+	}
 
-        return localsMap;
-    }
+	/**
+	 * Method that this frame originated in.
+	 */
+	private Method method;
 
-    @Override
-    public String toString() {
-        return "Frame{"
-            + ", locals=" + Arrays.toString(locals)
-            + '}';
-    }
+	/**
+	 * Local variable information for this frame.
+	 */
+	private final LocalVariable[] locals;
 
-    /**
-     * Class representing a single local variable.
-     */
-    public static final class LocalVariable {
-        /**
-         * Variable name.
-         */
-        final String name;
-        /**
-         * Variable value.
-         */
-        final Object value;
+	/**
+	 * Construct a {@link Frame}.
+	 *
+	 * @param method
+	 *            Method that this frame originated in.
+	 * @param locals
+	 *            Local variable information for this frame.
+	 */
+	public Frame(Method method, LocalVariable[] locals) {
+		this.method = method;
+		this.locals = locals;
+	}
 
-        /**
-         * Construct a {@link LocalVariable} for a live object.
-         *
-         * @param name Variable name.
-         * @param value Variable value.
-         */
-        public LocalVariable(String name, Object value) {
-            this.name = name;
-            this.value = value;
-        }
+	/**
+	 * Converts the locals array to a Map of variable-name -> variable-value.
+	 *
+	 * @return Map of variable-name -> variable-value.
+	 */
+	public Map<String, Object> getLocals() {
+		if (locals == null || locals.length == 0)
+			return Collections.emptyMap();
 
-        public String getName() {
-            return name;
-        }
+		Map<String, Object> localsMap = new HashMap<>();
+		for (Frame.LocalVariable localVariable : locals)
+			if (localVariable != null)
+				localsMap.put(localVariable.getName(), localVariable.getValue());
 
-        public Object getValue() {
-            return value;
-        }
+		return localsMap;
+	}
 
-        @Override
-        public String toString() {
-            return "LocalVariable{"
-                + "name='" + name + '\''
-                + ", value=" + value
-                + '}';
-        }
-    }
+	public Method getMethod() {
+		return method;
+	}
+
+	@Override
+	public String toString() {
+		return "Frame{" + ", locals=" + Arrays.toString(locals) + '}';
+	}
 }

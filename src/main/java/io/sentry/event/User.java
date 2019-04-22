@@ -1,69 +1,77 @@
 package io.sentry.event;
 
-
 import java.io.Serializable;
 import java.util.Map;
 
 /**
- * An object that represents a user. Typically used to represent
- * the user in the current context, for whatever a context means
- * in your application (typically a web request).
+ * An object that represents a user. Typically used to represent the user in the
+ * current context, for whatever a context means in your application (typically
+ * a web request).
  */
 public class User implements Serializable {
 	private static final long serialVersionUID = -4695819353032790308L;
 	private final String id;
-    private final String username;
-    private final String ipAddress;
-    private final String email;
-    private final Map<String, Object> data;
+	private final String username;
+	private final String ipAddress;
+	private final String email;
+	private final Map<String, Object> data;
 
-    /**
-     * Create an immutable User object.
-     *
-     * @param id        String (optional)
-     * @param username  String (optional)
-     * @param ipAddress String (optional)
-     * @param email     String (optional)
-     * @param data      Extra user data (optional)
-     */
-    public User(String id, String username, String ipAddress, String email, Map<String, Object> data) {
-        this.id = id;
-        this.username = username;
-        this.ipAddress = ipAddress;
-        this.email = email;
-        this.data = data;
-    }
+	/**
+	 * Create an immutable User object.
+	 *
+	 * @param id
+	 *            String (optional)
+	 * @param username
+	 *            String (optional)
+	 * @param ipAddress
+	 *            String (optional)
+	 * @param email
+	 *            String (optional)
+	 */
+	public User(String id, String username, String ipAddress, String email) {
+		this(id, username, ipAddress, email, null);
+	}
 
-    /**
-     * Create an immutable User object.
-     *
-     * @param id        String (optional)
-     * @param username  String (optional)
-     * @param ipAddress String (optional)
-     * @param email     String (optional)
-     */
-    public User(String id, String username, String ipAddress, String email) {
-        this(id, username, ipAddress, email, null);
-    }
+	/**
+	 * Create an immutable User object.
+	 *
+	 * @param id
+	 *            String (optional)
+	 * @param username
+	 *            String (optional)
+	 * @param ipAddress
+	 *            String (optional)
+	 * @param email
+	 *            String (optional)
+	 * @param data
+	 *            Extra user data (optional)
+	 */
+	public User(String id, String username, String ipAddress, String email, Map<String, Object> data) {
+		this.id = id;
+		this.username = username;
+		this.ipAddress = ipAddress;
+		this.email = email;
+		this.data = data;
+	}
 
-    public String getId() {
-        return id;
-    }
+	public Map<String, Object> getData() {
+		return data;
+	}
 
-    public String getUsername() {
-        return username;
-    }
+	public String getEmail() {
+		return email;
+	}
 
-    public String getIpAddress() {
-        return ipAddress;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public String getEmail() {
-        return email;
-    }
+	public String getIpAddress() {
+		return ipAddress;
+	}
 
-    public Map<String, Object> getData() {
-        return data;
-    }
+	public String getUsername() {
+		return username;
+	}
 
 }
