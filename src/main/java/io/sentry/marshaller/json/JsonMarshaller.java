@@ -249,7 +249,7 @@ public class JsonMarshaller implements Marshaller {
 	@SuppressWarnings("unchecked")
 	private <T extends SentryInterface> InterfaceBinding<? super T> getInterfaceBinding(T sentryInterface) {
 		// Reduces the @SuppressWarnings to a oneliner
-		return interfaceBindings.get(sentryInterface.getClass());
+		return (InterfaceBinding<? super T>) interfaceBindings.get(sentryInterface.getClass());
 	}
 
 	public boolean isCompressed() {
